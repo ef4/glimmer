@@ -7,14 +7,6 @@ export default class NodeDOMHelper extends DOMHelper {
     super(new SimpleDOM.Document());
   }
 
-  createTextNode(text: string): Text {
-    return this.document.createTextNode(text);
-  }
-
-  createElement(tag: string, context?: Element): Element {
-    return this.document.createElement(tag);
-  }
-
   insertHTMLBefore(parent: Element, nextSibling: Node, html: string): Bounds {
     let prev = nextSibling ? nextSibling.previousSibling : parent.lastChild;
 
