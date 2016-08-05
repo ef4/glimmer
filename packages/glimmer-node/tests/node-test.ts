@@ -1,9 +1,8 @@
 import * as QUnit from 'qunitjs';
 import * as SimpleDOM from 'simple-dom';
 
-import { forEach } from "glimmer-util";
 import { TestEnvironment, TestDynamicScope} from "glimmer-test-helpers/lib/environment";
-import { Template, AttributeChangeList } from 'glimmer-runtime';
+import { Template } from 'glimmer-runtime';
 import { UpdatableReference } from 'glimmer-object-reference';
 import NodeDOMHelper from 'glimmer-node/lib/node-dom-helper';
 
@@ -12,21 +11,15 @@ let voidMap = SimpleDOM.voidMap;
 
 let serializer = new HTMLSerializer(voidMap);
 
-const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
-const XLINK_NAMESPACE = 'http://www.w3.org/1999/xlink';
-const XHTML_NAMESPACE = 'http://www.w3.org/1999/xhtml';
+// const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
+// const XLINK_NAMESPACE = 'http://www.w3.org/1999/xlink';
+// const XHTML_NAMESPACE = 'http://www.w3.org/1999/xhtml';
 
 let env: TestEnvironment, root: HTMLElement;
 let helper: NodeDOMHelper;
 
 function compile(template: string) {
   return env.compile(template);
-}
-
-function compilesTo(html: string, expected: string=html, context: any={}) {
-  let template = compile(html);
-  root = rootElement();
-  render(template, context);
 }
 
 function rootElement(): HTMLDivElement {
@@ -68,8 +61,6 @@ QUnit.test("HTML tags", function(assert) {
 QUnit.test("HTML tags re-rendered", function(assert) {
   let template = compile("<h1>hello!</h1><div>content</div>");
   let result = render(template, {});
-
-  let oldFirstChild = root.firstChild;
 
   env.begin();
   result.rerender();
