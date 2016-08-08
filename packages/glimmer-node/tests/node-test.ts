@@ -184,3 +184,23 @@ QUnit.test("The compiler can handle unescaped HTML", function(assert) {
 
   assert.equal(serializer.serializeChildren(root), '<div><strong>hello</strong></div>');
 });
+
+QUnit.test("Unescaped helpers render correctly", function(assert) {
+  env.registerHelper('testing-unescaped', function(params) {
+    return params[0];
+  });
+
+  let escapedTemplate = compile('{{{testing-unescaped "<span>hi</span>"}}}');
+
+  render(escapedTemplate, {});
+
+  assert.equal(serializer.serialize(root), '<div><span>hi</span></div>');
+});
+
+QUnit.test('Null literals do not have representation in DOM', function(assert) {
+  let template = compile('{{null}}');
+
+  render(template, {});
+
+  assert.equal(serializer.serialize(root), '<div></div>');
+})
