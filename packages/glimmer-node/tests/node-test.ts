@@ -4,7 +4,7 @@ import * as SimpleDOM from 'simple-dom';
 import { TestEnvironment, TestDynamicScope} from "glimmer-test-helpers/lib/environment";
 import { Template } from 'glimmer-runtime';
 import { UpdatableReference } from 'glimmer-object-reference';
-import NodeDOMHelper from 'glimmer-node/lib/node-dom-helper';
+import NodeDOMChanges from 'glimmer-node/lib/node-dom-helper';
 
 let HTMLSerializer = SimpleDOM.HTMLSerializer;
 let voidMap = SimpleDOM.voidMap;
@@ -16,7 +16,7 @@ let serializer = new HTMLSerializer(voidMap);
 // const XHTML_NAMESPACE = 'http://www.w3.org/1999/xhtml';
 
 let env: TestEnvironment, root: HTMLElement;
-let helper: NodeDOMHelper;
+let helper: NodeDOMChanges;
 
 function compile(template: string) {
   return env.compile(template);
@@ -27,7 +27,7 @@ function rootElement(): HTMLDivElement {
 }
 
 function commonSetup() {
-  helper = new NodeDOMHelper();
+  helper = new NodeDOMChanges();
   env = new TestEnvironment(helper); // TODO: Support SimpleDOM
   root = rootElement();
 }
@@ -203,4 +203,28 @@ QUnit.test('Null literals do not have representation in DOM', function(assert) {
   render(template, {});
 
   assert.equal(serializer.serialize(root), '<div></div>');
-})
+});
+
+QUnit.test("Attributes can be populated with helpers that generate a string", function(assert) {
+  env.registerHelper('testing', function(params) {
+    return params[0];
+  });
+
+  let escapedTemplate = compile('<a href="{{testing url}}">linky</a>');
+
+  render(escapedTemplate, { url: 'linky.html' });
+
+  assert.equal(serializer.serialize(root), '<div><a href="linky.html">linky</a></div>');
+});
+
+QUnit.test("Elements inside a yielded block", function(assert) {
+  let template = compile('{{#if true}}<div id="test">123</div>{{/if}}');
+  render(template, {});
+  assert.equal(serializer.serialize(root), '<div><div id="test">123</div></div>');
+});
+
+QUnit.test("A simple block helper can return text", function(assert) {
+  let template = compile('{{#if true}}test{{else}}not shown{{/if}}');
+  render(template, {});
+  assert.equal(serializer.serialize(root), '<div>test</div>');
+});

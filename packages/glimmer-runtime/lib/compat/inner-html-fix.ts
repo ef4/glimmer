@@ -1,5 +1,5 @@
 import { Bounds, ConcreteBounds } from '../bounds';
-import { moveNodesBefore, DOMHelper } from '../dom/helper';
+import { moveNodesBefore, DOMChanges } from '../dom/helper';
 
 // Patch:    innerHTML Fix
 // Browsers: IE9
@@ -8,8 +8,8 @@ import { moveNodesBefore, DOMHelper } from '../dom/helper';
 // Fix:      Wrap the innerHTML we are about to set in its parents, apply the
 //           wrapped innerHTML on a div, then move the unwrapped nodes into the
 //           target position.
-export default function applyInnerHTMLFix(document: Document, DOMHelperClass: typeof DOMHelper): typeof DOMHelper {
-  if (!document) return DOMHelperClass;
+export default function applyInnerHTMLFix(document: Document, DOMChangesClass: typeof DOMChanges): typeof DOMChanges {
+  if (!document) return DOMChangesClass;
 
   let table = document.createElement('table');
 
@@ -19,7 +19,7 @@ export default function applyInnerHTMLFix(document: Document, DOMHelperClass: ty
   } finally {
     if (table.childNodes.length !== 0) {
       // It worked as expected, no fix required
-      return DOMHelperClass;
+      return DOMChangesClass;
     }
   }
 
@@ -36,7 +36,7 @@ export default function applyInnerHTMLFix(document: Document, DOMHelperClass: ty
 
   let div = document.createElement('div');
 
-  return class DOMHelperWithInnerHTMLFix extends DOMHelperClass {
+  return class DOMChangesWithInnerHTMLFix extends DOMChangesClass {
     insertHTMLBefore(parent: HTMLElement, nextSibling: Node, html: string): Bounds {
       if (html === null || html === '') {
         return super.insertHTMLBefore(parent, nextSibling, html);

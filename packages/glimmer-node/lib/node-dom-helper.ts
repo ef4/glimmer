@@ -1,8 +1,8 @@
 import * as SimpleDOM from 'simple-dom';
 import { ConcreteBounds } from 'glimmer-runtime/lib/bounds';
-import { DOMHelper } from 'glimmer-runtime';
+import { DOMTreeConstruction } from 'glimmer-runtime';
 
-export default class NodeDOMHelper extends DOMHelper {
+export default class NodeDOMChanges extends DOMTreeConstruction {
   constructor() {
     super(new SimpleDOM.Document());
   }
