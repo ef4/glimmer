@@ -1,4 +1,4 @@
-import * as Simple from './dom/interface';
+import * as Simple from './dom/interfaces';
 
 export interface Bounds {
   // a method to future-proof for wormholing; may not be needed ultimately

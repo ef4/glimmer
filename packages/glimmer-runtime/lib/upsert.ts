@@ -1,6 +1,6 @@
 import { Opaque } from 'glimmer-util';
 import { DOMChanges, DOMTreeConstruction } from './dom/helper';
-import * as Simple from './dom/interface';
+import * as Simple from './dom/interfaces';
 import { Bounds, Cursor, SingleNodeBounds, single, clear } from './bounds';
 
 export interface SafeString {

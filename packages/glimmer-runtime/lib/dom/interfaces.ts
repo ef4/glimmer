@@ -26,13 +26,9 @@ export interface CharacterData extends Node {
   data: string;
 }
 
-export interface Text extends CharacterData {
+export interface Text extends CharacterData {}
 
-}
-
-export interface Comment extends CharacterData {
-
-}
+export interface Comment extends CharacterData {}
 
 export interface Element extends Node {
   tagName: string;
@@ -41,10 +37,6 @@ export interface Element extends Node {
   insertBefore(node: Node, reference: Node): void;
 }
 
-export interface SVGElement extends Element {
+export interface SVGElement extends Element {}
 
-}
-
-export interface HTMLElement extends Element {
-
-}
+export interface HTMLElement extends Element {}

@@ -1,6 +1,6 @@
 import { Opaque } from 'glimmer-util';
 import { DOMNamespace } from './helper';
-import * as Simple from './interface';
+import * as Simple from './interfaces';
 import {
   sanitizeAttributeValue,
   requiresSanitization
@@ -90,11 +90,7 @@ export const AttributeChangeList: IChangeList = new class {
     let dom = env.getAppendOperations();
 
     if (value !== null && value !== undefined) {
-      if (namespace) {
-        dom.setAttributeNS(element, namespace, attr, normalizeTextValue(value));
-      } else {
-        dom.setAttribute(element, attr, normalizeTextValue(value));
-      }
+      dom.setAttribute(element, attr, normalizeTextValue(value), namespace);
     }
   }
 

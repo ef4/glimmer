@@ -2,7 +2,7 @@ import { ConcreteBounds, SingleNodeBounds, Bounds } from '../bounds';
 import applyTableElementFix from '../compat/inner-html-fix';
 import applySVGElementFix from '../compat/svg-inner-html-fix';
 import applyTextNodeMergingFix from '../compat/text-node-merging-fix';
-import * as SimplifiedDOM from './interface';
+import * as SimplifiedDOM from './interfaces';
 
 export const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
@@ -62,12 +62,12 @@ namespace DOM {
       return this.document.createElementNS(namespace, tag);
     }
 
-    setAttribute(element: Element, name: string, value: string) {
-      element.setAttribute(name, value);
-    }
-
-    setAttributeNS(element: Element, namespace: Namespace, name: string, value: string) {
-      element.setAttributeNS(namespace, name, value);
+    setAttribute(element: Element, name: string, value: string, namespace?: string) {
+      if (namespace) {
+        element.setAttributeNS(namespace, name, value);
+      } else {
+        element.setAttribute(name, value);
+      }
     }
 
     createTextNode(text: string): Text {
@@ -253,4 +253,4 @@ helper = applySVGElementFix(doc, helper, SVG_NAMESPACE);
 export default helper;
 export const DOMTreeConstruction = DOM.TreeConstruction;
 export type DOMTreeConstruction = DOM.TreeConstruction;
-export { Namespace as DOMNamespace } from './interface';
+export { Namespace as DOMNamespace } from './interfaces';
