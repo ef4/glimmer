@@ -203,7 +203,7 @@ export class DOMChanges {
   }
 }
 
-export function insertHTMLBefore(this: void, useless: HTMLElement, _parent: Element, nextSibling: Node, html: string): Bounds { // tslint:disable-line
+function defaultInsertHTMLBefore(this: void, useless: HTMLElement, _parent: Element, nextSibling: Node, html: string): Bounds { // tslint:disable-line
   // TypeScript vendored an old version of the DOM spec where `insertAdjacentHTML`
   // only exists on `HTMLElement` but not on `Element`. We actually work with the
   // newer version of the DOM API here (and monkey-patch this method in `./compat`
@@ -237,6 +237,29 @@ export function insertHTMLBefore(this: void, useless: HTMLElement, _parent: Elem
 
   let first = prev ? prev.nextSibling : parent.firstChild;
   return new ConcreteBounds(parent, first, last);
+}
+
+function fixSVG(this: void, useless: HTMLElement, _parent: Element, nextSibling: Node, html: string): Bounds { // tslint:disable-line
+  // IE, Edge: also do not correctly support using `innerHTML` on SVG
+  // namespaced elements. So here a wrapper is used.
+  let wrappedHtml = '<svg>' + html + '</svg>';
+
+  useless.innerHTML = wrappedHtml;
+
+  let [first, last] = moveNodesBefore(useless.firstChild, _parent, nextSibling);
+  return new ConcreteBounds(_parent, first, last);
+}
+
+export function insertHTMLBefore(this: void, useless: HTMLElement, _parent: Element, nextSibling: Node, html: string): Bounds { // tslint:disable-line
+  if (html === null || html === '') {
+    return defaultInsertHTMLBefore(useless, _parent, nextSibling, html);
+  }
+
+  if (_parent.namespaceURI !== SVG_NAMESPACE) {
+    return defaultInsertHTMLBefore(useless, _parent, nextSibling, html);
+  } else {
+    return fixSVG(useless, _parent, nextSibling, html);
+  }
 }
 
 function isDocumentFragment(node: Node): node is DocumentFragment {
