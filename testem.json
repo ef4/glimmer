@@ -2,18 +2,10 @@
   "framework": "qunit",
   "test_page": "tests/index.html?hidepassed",
   "disable_watching": true,
-  "launchers": {
-    "Node": {
-      "command": "./bin/run-node-tests.js",
-      "output": "tap"
-    }
-  },
   "launch_in_dev": [
-    "PhantomJS",
-    "Node"
+    "PhantomJS"
   ],
   "launch_in_ci": [
-    "PhantomJS",
-    "Node"
+    "PhantomJS"
   ]
 }
