@@ -56,3 +56,16 @@ export default function applyInnerHTMLFix(document: Document, DOMChangesClass: t
     }
   };
 }
+
+
+export function fixSVG(this: void, useless: HTMLElement, _parent: Element, nextSibling: Node, html: string): Bounds { // tslint:disable-line
+  let parent = _parent as HTMLElement;
+    // IE, Edge: also do not correctly support using `innerHTML` on SVG
+  // namespaced elements. So here a wrapper is used.
+  let wrappedHtml = '<svg>' + html + '</svg>';
+
+  useless.innerHTML = wrappedHtml;
+
+  let [first, last] = moveNodesBefore(useless.firstChild, parent, nextSibling);
+  return new ConcreteBounds(parent, first, last);
+}

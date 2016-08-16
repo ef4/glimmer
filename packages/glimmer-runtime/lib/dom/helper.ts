@@ -1,6 +1,6 @@
 import { ConcreteBounds, SingleNodeBounds, Bounds } from '../bounds';
-import applyTableElementFix from '../compat/inner-html-fix';
-import applySVGElementFix from '../compat/svg-inner-html-fix';
+import { default as applyTableElementFix, fixInnerHTML, requiresInnerHTMLFix } from '../compat/inner-html-fix';
+import { default as applySVGElementFix, fixSVG } from '../compat/svg-inner-html-fix';
 import applyTextNodeMergingFix from '../compat/text-node-merging-fix';
 import * as SimplifiedDOM from './interfaces';
 
@@ -239,27 +239,40 @@ function defaultInsertHTMLBefore(this: void, useless: HTMLElement, _parent: Elem
   return new ConcreteBounds(parent, first, last);
 }
 
-function fixSVG(this: void, useless: HTMLElement, _parent: Element, nextSibling: Node, html: string): Bounds { // tslint:disable-line
-  // IE, Edge: also do not correctly support using `innerHTML` on SVG
-  // namespaced elements. So here a wrapper is used.
-  let wrappedHtml = '<svg>' + html + '</svg>';
+function fixNodeMerging(this: void, uselessElement: HTMLElement, uselessComment: Comment, _parent: Element, nextSibling: Node, html: string): Bounds { // tslint:disable-line
+  let parent = _parent as HTMLElement;
 
-  useless.innerHTML = wrappedHtml;
+  parent.insertBefore(uselessComment, nextSibling);
 
-  let [first, last] = moveNodesBefore(useless.firstChild, _parent, nextSibling);
-  return new ConcreteBounds(_parent, first, last);
+  let bounds = insertHTMLBefore(uselessElement, uselessComment, parent, nextSibling, html);
+
+  parent.removeChild(uselessComment);
+
+  return bounds;
 }
 
-export function insertHTMLBefore(this: void, useless: HTMLElement, _parent: Element, nextSibling: Node, html: string): Bounds { // tslint:disable-line
+export function insertHTMLBefore(this: void, uselessElement: HTMLElement, uselessComment: Comment, _parent: Element, nextSibling: Node, html: string): Bounds { // tslint:disable-line
+  let parent = _parent as HTMLElement;
+
   if (html === null || html === '') {
-    return defaultInsertHTMLBefore(useless, _parent, nextSibling, html);
+    return defaultInsertHTMLBefore(uselessElement, parent, nextSibling, html);
   }
 
-  if (_parent.namespaceURI !== SVG_NAMESPACE) {
-    return defaultInsertHTMLBefore(useless, _parent, nextSibling, html);
-  } else {
-    return fixSVG(useless, _parent, nextSibling, html);
+  let nextPrevious = nextSibling ? nextSibling.previousSibling : parent.lastChild;
+
+  if (nextPrevious && nextPrevious instanceof Text) {
+    return fixNodeMerging(uselessElement, uselessComment, parent, nextSibling, html);
   }
+
+  if (requiresInnerHTMLFix(parent)) {
+    return fixInnerHTML(uselessElement, parent, nextSibling, html);
+  }
+
+  if (parent.namespaceURI === SVG_NAMESPACE) {
+    return fixSVG(uselessElement, parent, nextSibling, html);
+  }
+
+  return defaultInsertHTMLBefore(uselessElement, parent, nextSibling, html);
 }
 
 function isDocumentFragment(node: Node): node is DocumentFragment {

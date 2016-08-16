@@ -670,14 +670,16 @@ export class TestModifierManager implements ModifierManager<TestModifier> {
 
 class TestTreeConstruction extends DOMTreeConstruction {
   private uselessElement: HTMLDivElement;
+  private uselessComment: Comment;
 
   constructor(document: Document) {
     super(document);
     this.uselessElement = document.createElement('div');
+    this.uselessComment = document.createComment('');
   }
 
   insertHTMLBefore(parent: Element, html: string, reference: Node): Bounds {
-    return insertHTMLBefore(this.uselessElement, parent, reference, html);
+    return insertHTMLBefore(this.uselessElement,  this.uselessComment, parent, reference, html);
   }
 }
 
